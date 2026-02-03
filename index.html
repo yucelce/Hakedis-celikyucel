@@ -398,16 +398,60 @@
 <script>
     // Başlangıç verileri
     let rows = [];
+    
+    async function checkAccess() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const apiKey = urlParams.get('apiKey');
+        const container = document.querySelector('.container');
+        const errorDiv = document.getElementById('auth-error');
+        const errorMessage = document.getElementById('error-message');
 
-    window.onload = function() {
-        try {
-            rows = JSON.parse(localStorage.getItem('hakedisRows')) || [{ desc: "", unit: "Adet", qty: 0, price: 0 }];
-        } catch(e) {
-            rows = [{ desc: "", unit: "Adet", qty: 0, price: 0 }];
+        if (!apiKey) {
+            container.style.display = 'none';
+            errorDiv.style.display = 'block';
+            errorMessage.innerText = "API anahtarı eksik. Lütfen ana sayfa üzerinden giriş yapın.";
+            return false;
         }
-        loadHeaderData();
-        renderTable();
-        calculateTotals();
+
+        try {
+            // Wix http-functions endpoint'ini sorgula
+            const response = await fetch(`https://www.celikyucel.com/_functions/validateKey?apiKey=${apiKey}`);
+            const data = await response.json();
+
+            if (data.valid === true) {
+                // Giriş başarılı
+                container.style.display = 'block';
+                errorDiv.style.display = 'none';
+                return true;
+            } else {
+                // Giriş başarısız
+                container.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorMessage.innerText = data.message || "API anahtarınızın süresi dolmuş veya geçersiz.";
+                return false;
+            }
+        } catch (error) {
+            console.error("Doğrulama hatası:", error);
+            container.style.display = 'none';
+            errorDiv.style.display = 'block';
+            errorMessage.innerText = "Sistem doğrulaması şu an yapılamıyor. Lütfen daha sonra tekrar deneyin.";
+            return false;
+        }
+    }
+
+    window.onload = async function() {
+        const hasAccess = await checkAccess();
+        
+        if (hasAccess) {
+            try {
+                rows = JSON.parse(localStorage.getItem('hakedisRows')) || [{ desc: "", unit: "Adet", qty: 0, price: 0 }];
+            } catch(e) {
+                rows = [{ desc: "", unit: "Adet", qty: 0, price: 0 }];
+            }
+            loadHeaderData();
+            renderTable();
+            calculateTotals();
+        }
     };
 
     function escapeHTML(str) {
