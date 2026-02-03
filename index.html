@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hakediş Hazırlama Uygulaması - Mobile Uyumlu</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+            --light-bg: #f9f9f9;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px; /* Mobilde kenar boşluğunu azalttık */
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px; /* Mobilde iç boşluğu azalttık */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Başlık ve buton sığmazsa alt satıra geçsin */
+            gap: 10px;
+        }
+
+        h1 { margin: 0; color: var(--primary-color); font-size: 1.5rem; }
+
+        /* PROJE BİLGİLERİ ALANI */
+        .project-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Masaüstü: 2 kolon */
+            gap: 15px;
+            margin-bottom: 20px;
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px; /* Dokunmatik için biraz büyüttük */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* TABLO STİLLERİ */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+        }
+
+        td input {
+            width: 100%;
+            border: 1px solid transparent; /* Varsayılan border şeffaf */
+            padding: 8px;
+            font-size: 1em;
+            outline: none;
+            background: transparent;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        td input:focus {
+            background: #fff;
+            border: 1px solid var(--accent-color);
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* BUTONLAR */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-add { background-color: var(--accent-color); color: white; width: 100%; max-width: 200px;} /* Mobilde tam genişlik olabilir */
+        .btn-add:hover { background-color: #2980b9; }
+
+        .btn-print { background-color: var(--secondary-color); color: white; }
+        .btn-print:hover { background-color: #2c3e50; }
+
+        .btn-clear { background-color: var(--danger-color); color: white; }
+        
+        .btn-delete { 
+            background-color: #ffeaea; 
+            color: var(--danger-color); 
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* ÖZET TABLOSU */
+        .summary-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .summary-table {
+            width: 100%;
+            max-width: 400px; /* Mobilde taşmasın diye max-width */
+        }
+
+        .summary-table td {
+            border: none;
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+        .payment-input {
+            width: 100%;
+            text-align: right;
+            border: 1px solid #ccc !important; 
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: var(--danger-color);
+            background: white;
+        }
+
+        .vat-input {
+            width: 60px !important;
+            text-align: center;
+            border: 1px solid #ccc !important;
+            padding: 5px !important;
+            border-radius: 4px;
+            display: inline-block;
+            background: white;
+        }
+
+        .grand-total { font-size: 1.1em; font-weight: bold; color: var(--primary-color); }
+        .net-total { 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            color: white; 
+            background-color: var(--primary-color); 
+            border-radius: 4px;
+        }
+        
+        .net-total td { padding: 15px 10px; }
+
+        /* =========================================
+           MOBİL UYUMLULUK (RESPONSIVE) CSS
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            
+            /* Proje Bilgilerini tek kolona düşür */
+            .project-info {
+                grid-template-columns: 1fr; 
+            }
+
+            /* TABLOYU KART GÖRÜNÜMÜNE ÇEVİRME */
+            #hakedisTable, #hakedisTable thead, #hakedisTable tbody, #hakedisTable th, #hakedisTable td, #hakedisTable tr {
+                display: block;
+            }
+
+            /* Tablo başlıklarını gizle (ama erişilebilirlik için silme) */
+            #hakedisTable thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            #hakedisTable tr {
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                background: #fff;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                padding: 10px;
+            }
+
+            #hakedisTable td {
+                border: none;
+                position: relative;
+                padding-left: 0;
+                padding-top: 25px; /* Etiket için üstte boşluk */
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+
+            #hakedisTable td:last-child {
+                border-bottom: none;
+                text-align: center;
+                padding-top: 10px;
+            }
+
+            /* CSS ile Etiketleri Ekleme (Data-Label attribute kullanacağız) */
+            #hakedisTable td::before {
+                content: attr(data-label);
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 0.85em;
+                font-weight: bold;
+                color: var(--secondary-color);
+                text-transform: uppercase;
+            }
+
+            /* Inputları mobilde belirginleştir */
+            #hakedisTable td input {
+                border: 1px solid #ddd;
+                background: #fafafa;
+                width: 100%;
+                box-sizing: border-box; /* Padding dahil hesapla */
+            }
+
+            /* Toplam Tutar hücresi */
+            #hakedisTable td strong {
+                display: block;
+                font-size: 1.2em;
+                color: var(--primary-color);
+                background: #eef;
+                padding: 5px;
+                border-radius: 4px;
+                text-align: right;
+            }
+            
+            /* Özet Tablosu Mobilde Tam Genişlik */
+            .summary-section {
+                display: block;
+            }
+            .summary-table {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .btn { width: 100%; margin-bottom: 5px; }
+            .btn-clear { float: none; }
+            .actions-bar { flex-direction: column; }
+        }
+
+        /* YAZDIRMA AYARLARI */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; width: 100%; }
+            .no-print { display: none !important; }
+            input { border: none !important; background: transparent !important; }
+            
+            /* Yazdırırken mobil görünümü iptal et, normal tablo olsun */
+            #hakedisTable, #hakedisTable thead, #hakedisTable tbody, #hakedisTable th, #hakedisTable td, #hakedisTable tr {
+                display: table-row;
+            }
+            #hakedisTable { display: table; }
+            #hakedisTable thead { display: table-header-group; }
+            #hakedisTable tbody { display: table-row-group; }
+            #hakedisTable td, #hakedisTable th { display: table-cell; }
+            
+            #hakedisTable td::before { content: none !important; } /* Etiketleri gizle */
+            
+            .net-total { background-color: #ddd !important; color: black !important; -webkit-print-color-adjust: exact; }
+            th { background-color: #eee !important; color: black !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Hakediş Raporu</h1>
+            <small>Otomatik Hesaplama Sistemi</small>
+        </div>
+        <div class="no-print">
+            <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Yazdır / PDF</button>
+        </div>
+    </header>
+
+    <div class="project-info">
+        <div class="form-group">
+            <label>Proje Adı:</label>
+            <input type="text" id="projectName" placeholder="Örn: Konut İnşaatı" oninput="saveData()">
+        </div>
+        <div class="form-group">
+            <label>Yüklenici Firma:</label>
+            <input type="text" id="contractorName" placeholder="Firma Adı" oninput="saveData()">
+        </div>
+        <div class="form-group">
+            <label>Hakediş No:</label>
+            <input type="text" id="reportNo" placeholder="1" oninput="saveData()">
+        </div>
+        <div class="form-group">
+            <label>Tarih:</label>
+            <input type="date" id="reportDate" oninput="saveData()">
+        </div>
+    </div>
+
+    <table id="hakedisTable">
+        <thead>
+            <tr>
+                <th width="5%">No</th>
+                <th width="40%">İş Kalemi Açıklaması</th>
+                <th width="10%">Birim</th>
+                <th width="10%">Miktar</th>
+                <th width="15%">Birim Fiyat (₺)</th>
+                <th width="15%">Toplam Tutar (₺)</th>
+                <th width="5%" class="no-print">Sil</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
+
+    <div class="actions-bar no-print">
+        <button type="button" class="btn btn-add" onclick="addNewRow()">+ Yeni Satır Ekle</button>
+        <button type="button" class="btn btn-clear" onclick="clearAll()">Tümünü Temizle</button>
+    </div>
+
+    <div class="summary-section">
+        <table class="summary-table">
+            <tr>
+                <td><strong>Ara Toplam:</strong></td>
+                <td class="text-right" id="subTotal">0,00 ₺</td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>KDV Oranı (%): </strong>
+                    <input type="number" id="vatRate" class="vat-input" value="20" oninput="calculateTotals(); saveData();">
+                </td>
+                <td class="text-right" id="vatTotal">0,00 ₺</td>
+            </tr>
+            <tr class="grand-total">
+                <td><strong>GENEL TOPLAM:</strong></td>
+                <td class="text-right" id="grandTotal">0,00 ₺</td>
+            </tr>
+            <tr>
+                <td style="color: var(--danger-color);"><strong>(-) Daha Önce Alınan:</strong><br><small>(Avans / Önceki Hakediş)</small></td>
+                <td class="text-right">
+                    <input type="number" id="prevPayment" class="payment-input" step="0.01" value="0" oninput="calculateTotals(); saveData();">
+                </td>
+            </tr>
+            <tr class="net-total">
+                <td><strong>NET ÖDENECEK:</strong></td>
+                <td class="text-right" id="netPayable">0,00 ₺</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Başlangıç verileri
+    let rows = [];
+
+    window.onload = function() {
+        try {
+            rows = JSON.parse(localStorage.getItem('hakedisRows')) || [{ desc: "", unit: "Adet", qty: 0, price: 0 }];
+        } catch(e) {
+            rows = [{ desc: "", unit: "Adet", qty: 0, price: 0 }];
+        }
+        loadHeaderData();
+        renderTable();
+        calculateTotals();
+    };
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function addNewRow() {
+        rows.push({ desc: "", unit: "Adet", qty: 0, price: 0 });
+        renderTable();
+        calculateTotals();
+        saveData();
+        
+        // Yeni eklenen satırın inputuna odaklan (Masaüstü için)
+        // Mobilde klavye açılıp ekranı kaydırmasın diye sadece masaüstünde odaklanabiliriz
+        if(window.innerWidth > 768) {
+             const inputs = document.getElementById('tableBody').querySelectorAll('tr:last-child input');
+             if(inputs.length > 0) inputs[0].focus();
+        }
+    }
+
+    function deleteRow(index) {
+        if (confirm('Bu satırı silmek istediğinize emin misiniz?')) {
+            rows.splice(index, 1);
+            if (rows.length === 0) {
+                rows.push({ desc: "", unit: "Adet", qty: 0, price: 0 });
+            }
+            renderTable();
+            calculateTotals();
+            saveData();
+        }
+    }
+
+    // Tabloyu çizme fonksiyonu - MOBİL İÇİN data-label EKLENDİ
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        rows.forEach((row, index) => {
+            let tr = document.createElement('tr');
+            let total = parseFloat(row.qty || 0) * parseFloat(row.price || 0);
+
+            // data-label attribute'ları CSS'in mobilde başlıkları göstermesini sağlar
+            tr.innerHTML = `
+                <td class="text-center" data-label="No">${index + 1}</td>
+                <td data-label="İş Kalemi Açıklaması"><input type="text" value="${escapeHTML(row.desc)}" oninput="updateRow(${index}, 'desc', this.value)" placeholder="İş kalemi giriniz..."></td>
+                <td data-label="Birim"><input type="text" value="${escapeHTML(row.unit)}" oninput="updateRow(${index}, 'unit', this.value)" class="text-center"></td>
+                <td data-label="Miktar"><input type="number" step="0.01" value="${row.qty}" oninput="updateRow(${index}, 'qty', this.value)" class="text-center"></td>
+                <td data-label="Birim Fiyat"><input type="number" step="0.01" value="${row.price}" oninput="updateRow(${index}, 'price', this.value)" class="text-right"></td>
+                <td class="text-right" data-label="Toplam Tutar"><strong id="total-${index}">${formatMoney(total)}</strong></td>
+                <td class="no-print text-center" data-label="İşlem"><button type="button" class="btn btn-delete" onclick="deleteRow(${index})">Sil 🗑️</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function updateRow(index, field, value) {
+        if (field === 'qty' || field === 'price') {
+            rows[index][field] = parseFloat(value) || 0;
+            let rowTotal = rows[index].qty * rows[index].price;
+            document.getElementById(`total-${index}`).innerText = formatMoney(rowTotal);
+        } else {
+            rows[index][field] = value;
+        }
+        
+        calculateTotals();
+        saveData();
+    }
+
+    function calculateTotals() {
+        let subTotal = rows.reduce((acc, row) => acc + (parseFloat(row.qty || 0) * parseFloat(row.price || 0)), 0);
+        let vatRate = parseFloat(document.getElementById('vatRate').value) || 0;
+        let vat = subTotal * (vatRate / 100); 
+        let grandTotal = subTotal + vat;
+        let prevPayment = parseFloat(document.getElementById('prevPayment').value) || 0;
+        let netPayable = grandTotal - prevPayment;
+
+        document.getElementById('subTotal').innerText = formatMoney(subTotal);
+        document.getElementById('vatTotal').innerText = formatMoney(vat);
+        document.getElementById('grandTotal').innerText = formatMoney(grandTotal);
+        document.getElementById('netPayable').innerText = formatMoney(netPayable);
+    }
+
+    function formatMoney(amount) {
+        return amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+    }
+
+    function saveData() {
+        try {
+            localStorage.setItem('hakedisRows', JSON.stringify(rows));
+            const headerData = {
+                projectName: document.getElementById('projectName').value,
+                contractorName: document.getElementById('contractorName').value,
+                reportNo: document.getElementById('reportNo').value,
+                reportDate: document.getElementById('reportDate').value,
+                prevPayment: document.getElementById('prevPayment').value,
+                vatRate: document.getElementById('vatRate').value
+            };
+            localStorage.setItem('hakedisHeader', JSON.stringify(headerData));
+        } catch(e) { console.log("Kayıt hatası"); }
+    }
+
+    function loadHeaderData() {
+        try {
+            const data = JSON.parse(localStorage.getItem('hakedisHeader'));
+            if (data) {
+                document.getElementById('projectName').value = data.projectName || '';
+                document.getElementById('contractorName').value = data.contractorName || '';
+                document.getElementById('reportNo').value = data.reportNo || '';
+                document.getElementById('reportDate').value = data.reportDate || '';
+                document.getElementById('prevPayment').value = data.prevPayment || 0;
+                document.getElementById('vatRate').value = data.vatRate || 20;
+            }
+        } catch(e) {}
+        
+        if (!document.getElementById('reportDate').value) {
+            document.getElementById('reportDate').valueAsDate = new Date();
+        }
+    }
+
+    function clearAll() {
+        if(confirm("Tüm veriler silinecek. Onaylıyor musunuz?")) {
+            localStorage.removeItem('hakedisRows');
+            localStorage.removeItem('hakedisHeader');
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>
